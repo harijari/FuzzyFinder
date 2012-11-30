@@ -119,14 +119,24 @@ endfunction
 let s:TEMP_VARIABLES_GROUP = expand('<sfile>:p')
 
 "
+function s:filterFileType(raw_ftype) 
+    if match(a:raw_ftype, '\.')
+        return split(a:raw_ftype, '\.')[0]
+    else
+        return a:raw_ftype
+    endif
+endfunction
+
+
+"
 function s:getFileType(bufNr)
   let ft = getbufvar(a:bufNr, '&filetype')
   if !empty(ft) || bufloaded(a:bufNr)
-    return ft
+    return s:filterFileType(ft)
   endif
   let ft = getbufvar(a:bufNr, 'fuf_buffertag_filetype')
   if !empty(ft)
-    return ft
+    return s:filterFileType(ft)
   endif
   call l9#tempvariables#set(s:TEMP_VARIABLES_GROUP, '&eventignore', 'FileType')
   call l9#tempvariables#set(s:TEMP_VARIABLES_GROUP, '&filetype', &filetype)
@@ -135,7 +145,7 @@ function s:getFileType(bufNr)
   let ft = &filetype
   call l9#tempvariables#end(s:TEMP_VARIABLES_GROUP)
   call setbufvar(a:bufNr, 'fuf_buffertag_filetype', ft)
-  return ft
+  return s:filterFileType(ft)
 endfunction
 
 "
